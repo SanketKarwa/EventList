@@ -16,6 +16,12 @@ class EventListViewModel: ObservableObject {
     init(repository: EventRepository) {
         self.repository = repository
         loadEvents()
+        repository.locationManager.$location
+            .compactMap { $0 }
+            .sink { [weak self] _ in
+                self?.objectWillChange.send()
+            }
+            .store(in: &cancellables)
     }
 
     func loadEvents() {
