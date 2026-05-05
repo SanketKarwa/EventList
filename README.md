@@ -79,9 +79,3 @@ View → ViewModel → Repository → (Cache / API)
 - Event data is lightweight → UserDefaults used  
 - Images are large → cached using NSCache  
 - API cache uses TTL (5 mins)  
-
----
-
-## Author
-
-Sanket Karwa
