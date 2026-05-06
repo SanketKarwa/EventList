@@ -17,7 +17,11 @@ class ImageViewModel: ObservableObject {
     private var cancellable: AnyCancellable?
 
     func load(from url: URL?) {
-        guard let url = url else { return }
+        let placeholder = UIImage(systemName: "photo")    
+        guard let url = url else {
+            self.image = placeholder
+            return
+        }
         if let cached = ImageCache.shared.object(forKey: url as NSURL) {
             print("cached")
             self.image = cached
@@ -26,9 +30,11 @@ class ImageViewModel: ObservableObject {
         if image != nil { return }
         cancellable = URLSession.shared.dataTaskPublisher(for: url)
             .map { UIImage(data: $0.data) }
-            .replaceError(with: nil)
+            .map { $0 ?? placeholder }
+            .replaceError(with: placeholder)
             .handleEvents(receiveOutput: { image in
-                if let image = image {
+                if let image = image,
+                    image.pngData() != placeholder?.pngData() {
                     ImageCache.shared.setObject(image, forKey: url as NSURL)
                 }
             })
